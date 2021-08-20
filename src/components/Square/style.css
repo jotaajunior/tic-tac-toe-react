@@ -1,0 +1,25 @@
+.square {
+  display: inline-flex;
+  width: 64px;
+  height: 64px;
+  border-radius: 5px;
+  margin: 8px;
+  border: 1px solid black;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.times {
+  color: red;
+}
+
+.circle {
+  color: blue;
+}
+
+.blocked {
+  cursor: not-allowed;
+}
