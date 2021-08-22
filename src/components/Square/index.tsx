@@ -10,7 +10,7 @@ export interface SquareProps extends HTMLProps<HTMLSpanElement> {
   isBlocked?: boolean
 }
 
-export function Square({ children, type, isBlocked, ...rest }: SquareProps) {
+export function Square({ type, isBlocked, ...rest }: SquareProps) {
   if (type === 'O') {
     return (
       <span

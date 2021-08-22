@@ -6,8 +6,7 @@
   width: 262px;
 }
 
-.reset-button {
-  margin-left: 16px;
+button {
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   border: none;
@@ -19,6 +18,11 @@
   transition: ease-in-out 1s;
 }
 
-.reset-button:hover {
+button:hover {
   background-color: black;
+}
+
+.buttons {
+  display: flex;
+  grid-gap: 16px;
 }

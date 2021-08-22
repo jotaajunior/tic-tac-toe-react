@@ -3,6 +3,7 @@ import produce from 'immer'
 
 import { Player, Matrix } from '../types'
 import { checkStatus, Status } from '../utils/checkStatus'
+import { useEffect } from 'react'
 
 export type GameContextProps = {
   round: number
@@ -12,6 +13,7 @@ export type GameContextProps = {
 
   play(row: number, col: number): void
   reset(): void
+  goBack(): void
 }
 
 export const GameContext = createContext({} as GameContextProps)
@@ -30,6 +32,13 @@ export function GameProvider({ children }: GameProviderProps) {
   // Game state
   const [matrix, setMatrix] = useState(initialMatrix)
 
+  // Game history
+  const [history, setHistory] = useState(() => [initialMatrix()])
+
+  // X vitories
+  const [timesVictories, setTimesVictories] = useState(0)
+  const [circleVictories, setCircleVictories] = useState(0)
+
   // Gets the current player based on the round
   const currentPlayer = useMemo(
     () => (round % 2 === 0 ? 'X' : 'O') as Player,
@@ -44,14 +53,17 @@ export function GameProvider({ children }: GameProviderProps) {
     if (status === Status.PLAYING) {
       if (matrix[row][col] === '-') {
         // Updates the matrix
-        setMatrix(
-          produce(matrix, (draft) => {
-            draft[row][col] = currentPlayer
-          }),
-        )
+        const newMatrix = produce(matrix, (draft) => {
+          draft[row][col] = currentPlayer
+        })
+
+        setMatrix(newMatrix)
 
         // Advances to the next round
         setRound(round + 1)
+
+        // Adds to the history
+        setHistory((history) => [...history, newMatrix])
       }
     }
   }
@@ -59,7 +71,35 @@ export function GameProvider({ children }: GameProviderProps) {
   // Resets the game
   function reset() {
     setMatrix(initialMatrix)
+    setHistory(() => [initialMatrix()])
     setRound(0)
+  }
+
+  // Updates victories
+  useEffect(() => {
+    if (status === Status.TIMES_WIN) {
+      setTimesVictories(timesVictories + 1)
+    }
+
+    if (status === Status.CIRCLE_WIN) {
+      setCircleVictories(circleVictories + 1)
+    }
+  }, [status, timesVictories, circleVictories])
+
+  // Go back in the history
+  function goBack() {
+    if (round > 0) {
+      setMatrix(history[round - 1])
+
+      // Removes the last from history
+      setHistory(
+        produce(history, (draft) => {
+          draft.pop()
+        }),
+      )
+
+      setRound(round - 1)
+    }
   }
 
   const values = {
@@ -69,6 +109,7 @@ export function GameProvider({ children }: GameProviderProps) {
     currentPlayer,
     reset,
     status,
+    goBack,
   }
 
   return <GameContext.Provider value={values}>{children}</GameContext.Provider>
